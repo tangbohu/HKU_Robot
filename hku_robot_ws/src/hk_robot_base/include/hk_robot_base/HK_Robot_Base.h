@@ -9,7 +9,7 @@
 #include"vec.h"
 #include"conf.h"
 
-class HK_Bobot_Base
+class HK_Robot_Base
 {
     private:
     Vector3f currentPose;
@@ -23,6 +23,8 @@ public:
 
     void gotoPose(Vector3f pose);
     void getPose(Vector3f& pose);
+    Vector3f getPose();
+    bool arriveAtPose(Vector3f pose, float tolerance =0.1, float r_tolerance=3.14/6.0);
     void setSpeed(Vector3f speed); //x,y,r
     void stop();
 
@@ -33,10 +35,14 @@ public:
     ros::Publisher   motor_publisher_;
     ros::Subscriber  pose_subscriber_;
 
-    void PoseSubscriberCallBack(const  TurbleBotSlamTopicName &);
+    void poseSubscriberCallBack(const  string& ); // TurbleBotSlamTopicName &);
 
+    void workFlowSpin();
 
-}
+    //////////////////////Please Fill the Task
+    void taskFlow();
+
+};
 
 
 

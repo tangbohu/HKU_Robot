@@ -197,3 +197,11 @@ include_directories(
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
+include_directories(include ${catkin_INCLUDE_DIRS})
+
+add_executable(hku_robot_base src/main.cpp)
+target_link_libraries(hku_robot_base ${catkin_LIBRARIES})
+add_dependencies(hku_robot_base main.cpp HK_Robot_Base.cpp)
+
+
