@@ -35,7 +35,7 @@ public:
     ros::Publisher   motor_publisher_;
     ros::Subscriber  pose_subscriber_;
 
-    void poseSubscriberCallBack(const  string& ); // TurbleBotSlamTopicName &);
+    void poseSubscriberCallBack(const  TurbleBotSlamTopicName& );
 
     void workFlowSpin();
 

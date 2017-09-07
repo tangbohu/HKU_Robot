@@ -103,7 +103,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
+  INCLUDE_DIRS include
 #  LIBRARIES hk_robot_base
 #  CATKIN_DEPENDS roscpp rospy std_msgs
 #  DEPENDS system_lib
@@ -118,6 +118,8 @@ catkin_package(
 # include_directories(include)
 include_directories(
   ${catkin_INCLUDE_DIRS}
+ 
+
 )
 
 ## Declare a C++ library
@@ -200,8 +202,8 @@ include_directories(
 
 include_directories(include ${catkin_INCLUDE_DIRS})
 
-add_executable(hku_robot_base src/main.cpp)
+add_executable(hku_robot_base src/main.cpp src/HK_Robot_Base.cpp)
 target_link_libraries(hku_robot_base ${catkin_LIBRARIES})
-add_dependencies(hku_robot_base main.cpp HK_Robot_Base.cpp)
+
 
 
