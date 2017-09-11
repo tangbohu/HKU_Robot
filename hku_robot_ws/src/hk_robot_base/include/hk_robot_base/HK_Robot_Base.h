@@ -52,7 +52,7 @@ public:
     void InitATaskSchedule();
     bool ATaskOfGotoPose(Vector3f pos_);
 
-    bool taskFlow(Vector<Vector3f> poses_ );
+    bool taskFlow(vector<Vector3f> poses_ );
 
 };
 

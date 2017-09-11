@@ -7,7 +7,7 @@ std::vector<Vector3f>  poses_;
 
 
 
-void setAllPoses()
+void setAllPoses()   // the first pos should list in the back of the vector
 {
     poses_.push_back(Vector3f());
     poses_.back()[0]=0.0;

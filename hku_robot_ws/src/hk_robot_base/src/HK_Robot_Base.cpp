@@ -83,8 +83,9 @@ void HK_Robot_Base::InitAGotoPoseSchedule()
 
 bool HK_Robot_Base::AGotoPoseScheduleFromSendPosUntilArrive(Vector3f pos_)
 {
-    if(gotoPose_init_)
+    if(gotoPose_init_)  // should deliver only once
     {
+        gotoPose(pos_);
         gotoPose(pos_);
         gotoPose_init_=false;
     }
@@ -107,23 +108,25 @@ bool HK_Robot_Base::ATaskOfGotoPose(Vector3f pos_)
         InitAGotoPoseSchedule();
         aTask_init_=false;
     }
-    retrun AGotoPoseScheduleFromSendPosUntilArrive(pos_);
+    return AGotoPoseScheduleFromSendPosUntilArrive(pos_);
 }
 
 bool HK_Robot_Base::taskFlow(vector<Vector3f> poses_)
 {
-
     while(!poses_.empty())
     {
-       if( ATaskOfGotoPose(poses_.back()))
+       if( ATaskOfGotoPose(poses_.back()))  // a goto pose task is finished.
        {
-           ROS_INFO("The Position (%.2f, %.2f, %.2f) is arrived!", poses_.front()[0],poses_.front()[1],poses_.front()[2]);
-            poses_.pop_back();
+            ROS_INFO("The Position (%.2f, %.2f, %.2f) is arrived!", poses_.back()[0],poses_.back()[1],poses_.back()[2]);
+            ROS_INFO("The Position (%.2f, %.2f, %.2f) is arrived!", poses_.back()[0],poses_.back()[1],poses_.back()[2]);
+            ROS_INFO("The Position (%.2f, %.2f, %.2f) is arrived!", poses_.back()[0],poses_.back()[1],poses_.back()[2]);
+            ROS_INFO("The Position (%.2f, %.2f, %.2f) is arrived!", poses_.back()[0],poses_.back()[1],poses_.back()[2]);
 
+            poses_.pop_back();
             InitATaskSchedule();
        }
-       else
-           return false;
+
+       return false;
     }
     return true;
 }
