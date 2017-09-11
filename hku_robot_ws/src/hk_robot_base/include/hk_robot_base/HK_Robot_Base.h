@@ -3,6 +3,8 @@
 
 #include <ros/ros.h>
 #include <std_msgs/String.h>
+#include <geometry_msgs/Point.h>
+#include<geometry_msgs/Quaternion.h>
 #include <ros/callback_queue.h>
 #include <tf/transform_listener.h>
 #include<vector>
@@ -15,7 +17,7 @@ using namespace std;
 class HK_Robot_Base
 {
     private:
-    Vector3f currentPose;
+    geometry_msgs::PoseStamped currentPose;
     bool gotoPose_init_=true;
     bool aTask_init_=true;
 
@@ -26,10 +28,10 @@ public:
 
     /////////////// robot control
 
-    void gotoPose(Vector3f pose);
-    void getPose(Vector3f& pose);
-    Vector3f getPose();
-    bool arriveAtPose(Vector3f pose, float tolerance =0.1, float r_tolerance=3.14/6.0);
+    void gotoPose(geometry_msgs::PoseStamped pose);
+    void getPose(geometry_msgs::PoseStamped& pose);
+    geometry_msgs::PoseStamped getPose();
+    bool arriveAtPose(geometry_msgs::PoseStamped pose, float tolerance =0.1, float r_tolerance=100);
     void setSpeed(Vector3f speed); //x,y,r
     void stop();
 
@@ -39,20 +41,20 @@ public:
     ros::NodeHandle nh_,n_;
     ros::Publisher   motor_publisher_;
     ros::Subscriber  pose_subscriber_;
+    tf::TransformListener tfListener;
+    //void poseSubscriberCallBack(const  TurbleBotSlamTopicName& );
 
-    void poseSubscriberCallBack(const  TurbleBotSlamTopicName& );
-
-    void workFlowSpin(vector<Vector3f> poses_ );
+    void workFlowSpin(vector<geometry_msgs::PoseStamped> poses_ );
 
     //////////////////////Please Fill the Task
 
     void InitAGotoPoseSchedule();
-    bool AGotoPoseScheduleFromSendPosUntilArrive(Vector3f pos_);
+    bool AGotoPoseScheduleFromSendPosUntilArrive(geometry_msgs::PoseStamped pos_);
 
     void InitATaskSchedule();
-    bool ATaskOfGotoPose(Vector3f pos_);
+    bool ATaskOfGotoPose(geometry_msgs::PoseStamped pos_);
 
-    bool taskFlow(vector<Vector3f> poses_ );
+    bool taskFlow(vector<geometry_msgs::PoseStamped> poses_ );
 
 };
 
