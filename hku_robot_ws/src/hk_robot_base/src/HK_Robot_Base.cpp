@@ -61,23 +61,69 @@ void HK_Robot_Base::stop()
 
 }
 
-
-void HK_Robot_Base::workFlowSpin()
+void HK_Robot_Base::workFlowSpin(Vector<Vector3f> poses_ )
 {
     ros::Rate loop_rate(100);
 
     while (ros::ok())
     {
-        taskFlow();
+        taskFlow(poses_);
 
         ros::spinOnce();
         loop_rate.sleep();
     }
 }
 
-void HK_Robot_Base::taskFlow()
+
+
+void HK_Robot_Base::InitAGotoPoseSchedule()
+{
+    gotoPose_init_=true;
+}
+
+bool HK_Robot_Base::AGotoPoseScheduleFromSendPosUntilArrive(Vector3f pos_)
+{
+    if(gotoPose_init_)
+    {
+        gotoPose(pos_);
+        gotoPose_init_=false;
+    }
+
+    if(arriveAtPose(pos_))
+        return true;
+    else
+        return false;
+}
+
+void HK_Robot_Base::InitATaskSchedule()
+{
+    aTask_init_=true;
+}
+
+bool HK_Robot_Base::ATaskOfGotoPose(Vector3f pos_)
+{
+    if(aTask_init_)
+    {
+        InitAGotoPoseSchedule();
+        aTask_init_=false;
+    }
+    retrun AGotoPoseScheduleFromSendPosUntilArrive(pos_);
+}
+
+bool HK_Robot_Base::taskFlow(vector<Vector3f> poses_)
 {
 
+    while(!poses_.empty())
+    {
+       if( ATaskOfGotoPose(poses_.back()))
+       {
+           ROS_INFO("The Position (%.2f, %.2f, %.2f) is arrived!", poses_.front()[0],poses_.front()[1],poses_.front()[2]);
+            poses_.pop_back();
 
-
+            InitATaskSchedule();
+       }
+       else
+           return false;
+    }
+    return true;
 }

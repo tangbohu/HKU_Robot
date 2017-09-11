@@ -5,14 +5,19 @@
 #include <std_msgs/String.h>
 #include <ros/callback_queue.h>
 #include <tf/transform_listener.h>
+#include<vector>
 
 #include"vec.h"
 #include"conf.h"
+
+using namespace std;
 
 class HK_Robot_Base
 {
     private:
     Vector3f currentPose;
+    bool gotoPose_init_=true;
+    bool aTask_init_=true;
 
 public:
 
@@ -37,10 +42,17 @@ public:
 
     void poseSubscriberCallBack(const  TurbleBotSlamTopicName& );
 
-    void workFlowSpin();
+    void workFlowSpin(vector<Vector3f> poses_ );
 
     //////////////////////Please Fill the Task
-    void taskFlow();
+
+    void InitAGotoPoseSchedule();
+    bool AGotoPoseScheduleFromSendPosUntilArrive(Vector3f pos_);
+
+    void InitATaskSchedule();
+    bool ATaskOfGotoPose(Vector3f pos_);
+
+    bool taskFlow(Vector<Vector3f> poses_ );
 
 };
 
