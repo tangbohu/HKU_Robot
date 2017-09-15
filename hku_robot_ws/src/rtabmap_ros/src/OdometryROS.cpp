@@ -65,7 +65,7 @@ OdometryROS::OdometryROS(bool stereoParams, bool visParams, bool icpParams) :
 	groundTruthFrameId_(""),
 	groundTruthBaseFrameId_(""),
 	guessFrameId_(""),
-	publishTf_(true),
+    publishTf_(false),
 	waitForTransform_(true),
 	waitForTransformDuration_(0.1), // 100 ms
 	publishNullWhenLost_(true),
@@ -160,6 +160,16 @@ void OdometryROS::onInit()
 					  "Identity will be used...", initialPoseStr.c_str());
 		}
 	}
+    else
+    {
+        ros::Time stamp;
+        do{
+            initialPose =getTransform("/map","/camera_link",stamp);
+            NODELET_INFO("wait for initial Pose (tf /map to /camera_link)");
+        }while(initialPose.isNull());
+        NODELET_INFO("get initial pose");
+
+    }
 
 
 	//parameters
@@ -349,6 +359,10 @@ Transform OdometryROS::getTransform(const std::string & fromFrameId, const std::
 
 void OdometryROS::processData(const SensorData & data, const ros::Time & stamp)
 {
+   /* std::cout<<"########################processData"<<std::endl;
+    std::cout<<"ground truth frame id "<<groundTruthFrameId_<<std::endl;
+    std::cout<<"is id "<<odometry_->getPose().isIdentity()<<" is empty "<<groundTruthFrameId_.empty()<<std::endl;
+    getchar();*/
 	if(odometry_->getPose().isIdentity() &&
 	   !groundTruthFrameId_.empty())
 	{

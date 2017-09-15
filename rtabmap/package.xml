@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package>
-  <name>hk_rtabmap</name>
+  <name>rtabmap</name>
   <version>0.13.2</version>
   <description>RTAB-Map's standalone library. RTAB-Map is a RGB-D SLAM approach with real-time constraints.</description>
   <maintainer email="matlabbe@gmail.com">Mathieu Labbe</maintainer>

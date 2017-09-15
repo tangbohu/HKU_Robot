@@ -655,7 +655,7 @@ void CoreWrapper::publishLoop(double tfDelay, double tfTolerance)
 			msg.header.frame_id = mapFrameId_;
 			msg.header.stamp = tfExpiration;
 			rtabmap_ros::transformToGeometryMsg(mapToOdom_, msg.transform);
-			tfBroadcaster_.sendTransform(msg);
+            //tfBroadcaster_.sendTransform(msg);
 			mapToOdomMutex_.unlock();
 		}
 		r.sleep();
