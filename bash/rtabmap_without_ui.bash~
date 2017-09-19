@@ -1,0 +1,2 @@
+roslaunch rtabmap_ros rtabmap_without_ui.launch rtabmap_args:="--delete_db_on_start"  namespace:="rtabmap1" rgb_topic:="/camera1/rgb/image_rect_color" depth_topic:="/camera1/depth_registered/image_raw" camera_info_topic:="/camera1/rgb/camera_info" rgbd_topic:="/camera1/rgbd_image" frame_id:="camera1_link" visual_odometry:=false
+

@@ -1,0 +1,1 @@
+roslaunch rtabmap_ros rtabmap_viz.launch rgb_topic:="/camera1/rgb/image_rect_color" depth_topic:="/camera/depth_registered/image_raw" camera_info_topic:="/camera/rgb/camera_info" namespace:="rtabmap1" frame_id:="camera_link"
