@@ -464,7 +464,7 @@ void CoreWrapper::onInit()
 	getMapSrv_ = nh.advertiseService("get_map", &CoreWrapper::getMapCallback, this);
 	getGridMapSrv_ = nh.advertiseService("get_grid_map", &CoreWrapper::getGridMapCallback, this);
 	getProjMapSrv_ = nh.advertiseService("get_proj_map", &CoreWrapper::getProjMapCallback, this);
-	publishMapDataSrv_ = nh.advertiseService("publish_map", &CoreWrapper::publishMapCallback, this);
+    publishMapDataSrv_ = nh.advertiseService("publish_map", &CoreWrapper::publishMapCallback, this);
 	setGoalSrv_ = nh.advertiseService("set_goal", &CoreWrapper::setGoalCallback, this);
 	cancelGoalSrv_ = nh.advertiseService("cancel_goal", &CoreWrapper::cancelGoalCallback, this);
 	setLabelSrv_ = nh.advertiseService("set_label", &CoreWrapper::setLabelCallback, this);
@@ -756,44 +756,59 @@ bool CoreWrapper::odomUpdate(const nav_msgs::OdometryConstPtr & odomMsg)
 	if(!paused_)
 	{
 		Transform odom = rtabmap_ros::transformFromPoseMsg(odomMsg->pose.pose);
-		if(!lastPose_.isIdentity() && !odom.isNull() && (odom.isIdentity() || (odomMsg->pose.covariance[0] >= BAD_COVARIANCE && odomMsg->twist.covariance[0] >= BAD_COVARIANCE)))
-		{
-			UWARN("Odometry is reset (identity pose or high variance (%f) detected). Increment map id!", MAX(odomMsg->pose.covariance[0], odomMsg->twist.covariance[0]));
-			rtabmap_.triggerNewMap();
-			covariance_ = cv::Mat();
-		}
 
-		lastPoseIntermediate_ = false;
-		lastPose_ = odom;
-		lastPoseStamp_ = odomMsg->header.stamp;
+        if(odom.isNull())//if no (visual) odom found
+        {
+            ros::Time stamp;
+            odom =rtabmap_ros::getTransform("/map","/camera_link",stamp,tfListener_,false);
+            // covariance_ = cv::Mat();
 
-		// Only update variance if odom is not null
-		if(!odom.isNull())
-		{
-			cv::Mat covariance;
-			float variance = odomMsg->twist.covariance[0];
-			if(variance == BAD_COVARIANCE)
-			{
-				//use the one of the pose
-				covariance = cv::Mat(6,6,CV_64FC1, (void*)odomMsg->pose.covariance.data()).clone();
-				covariance /= 2.0;
-			}
-			else
-			{
-				covariance = cv::Mat(6,6,CV_64FC1, (void*)odomMsg->twist.covariance.data()).clone();
-			}
+        }
+       // else
+       // {
 
-			if(uIsFinite(covariance.at<double>(0,0)) &&
-				covariance.at<double>(0,0) != 1.0 &&
-				covariance.at<double>(0,0)>0.0)
-			{
-				// Use largest covariance error (to be independent of the odometry frame rate)
-				if(covariance_.empty() || covariance.at<double>(0,0) > covariance_.at<double>(0,0))
-				{
-					covariance_ = covariance;
-				}
-			}
-		}
+            if(!lastPose_.isIdentity() && !odom.isNull() && (odom.isIdentity() || (odomMsg->pose.covariance[0] >= BAD_COVARIANCE && odomMsg->twist.covariance[0] >= BAD_COVARIANCE)))
+            {
+                UWARN("Odometry is reset (identity pose or high variance (%f) detected). Increment map id!", MAX(odomMsg->pose.covariance[0], odomMsg->twist.covariance[0]));
+              //  rtabmap_.triggerNewMap();
+                covariance_ = cv::Mat();
+            }
+
+            lastPoseIntermediate_ = false;
+            lastPose_ = odom;
+            lastPoseStamp_ = odomMsg->header.stamp;
+
+            // Only update variance if odom is not null
+            if(!odom.isNull())
+            {
+                cv::Mat covariance;
+                float variance = odomMsg->twist.covariance[0];
+                if(variance == BAD_COVARIANCE)
+                {
+                    //use the one of the pose
+                    covariance = cv::Mat(6,6,CV_64FC1, (void*)odomMsg->pose.covariance.data()).clone();
+                    covariance /= 2.0;
+                }
+                else
+                {
+                    covariance = cv::Mat(6,6,CV_64FC1, (void*)odomMsg->twist.covariance.data()).clone();
+                }
+
+                if(uIsFinite(covariance.at<double>(0,0)) &&
+                    covariance.at<double>(0,0) != 1.0 &&
+                    covariance.at<double>(0,0)>0.0)
+                {
+                    // Use largest covariance error (to be independent of the odometry frame rate)
+                    if(covariance_.empty() || covariance.at<double>(0,0) > covariance_.at<double>(0,0))
+                    {
+                        covariance_ = covariance;
+                    }
+                }
+            }
+
+       // }
+
+
 
 		// Throttle
 		bool ignoreFrame = false;

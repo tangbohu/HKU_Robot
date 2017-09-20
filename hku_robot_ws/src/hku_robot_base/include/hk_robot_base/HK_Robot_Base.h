@@ -54,7 +54,7 @@ public:
     void InitATaskSchedule();
     bool ATaskOfGotoPose(geometry_msgs::PoseStamped pos_);
 
-    bool taskFlow(vector<geometry_msgs::PoseStamped> poses_ );
+    bool taskFlow(vector<geometry_msgs::PoseStamped>& poses_ );
 
 };
 

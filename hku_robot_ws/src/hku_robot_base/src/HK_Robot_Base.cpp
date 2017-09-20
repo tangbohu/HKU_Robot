@@ -10,7 +10,8 @@ HK_Robot_Base::HK_Robot_Base():nh_("~")
 //    pose_subscriber_ = nh_.subscribe(TurtbleBotSlamNodeName, 10,
 //                &HK_Robot_Base::poseSubscriberCallBack, this);
 
-    motor_publisher_=nh_.advertise<geometry_msgs::PoseStamped>("/move_base_simple/goal",5);
+    motor_publisher_=nh_.advertise<geometry_msgs::PoseStamped>("/move_base_simple/goal",20);
+
 }
 
 
@@ -39,7 +40,7 @@ void HK_Robot_Base::getPose(geometry_msgs::PoseStamped& pose)
 {
    //pose=currentPose_;
 
-   geometry_msgs::PoseStamped pBase, pMap;
+   geometry_msgs::PoseStamped pBase;
    pBase.header.frame_id = "base_link";
    pBase.pose.position .x = 0.0;
    pBase.pose.position.y = 0.0;
@@ -49,13 +50,34 @@ void HK_Robot_Base::getPose(geometry_msgs::PoseStamped& pose)
    tfListener.getLatestCommonTime(pBase.header.frame_id, "map", current_transform, NULL);
    pBase.header.stamp = current_transform;
 
-     try{
-     tfListener.transformPose("map",pBase,pMap); // pose_world is in world frame
-     }
-     catch( tf::TransformException ex)
-     {
-         ROS_ERROR("transfrom exception : %s",ex.what());
-     }
+
+   tf::StampedTransform xform;
+   try
+   {
+     // The waypoint frame is the source frame
+         tfListener.waitForTransform("map", "base_link", ros::Time::now(),ros::Duration(3));
+         tfListener.lookupTransform("map", "base_link", ros::Time(0), xform);
+   }
+   catch (tf::TransformException ex)
+   {
+     ROS_ERROR("%s", ex.what());
+   }
+
+   geometry_msgs::PoseStamped pMap;
+
+   pMap.header.stamp = ros::Time::now();
+   pMap.header.frame_id = "map";
+
+   pMap.pose.position.x = xform.getOrigin().getX();
+   pMap.pose.position.y = xform.getOrigin().getY();
+   pMap.pose.position.z = xform.getOrigin().getZ();
+
+   pMap.pose.orientation.x = xform.getRotation().getX();
+   pMap.pose.orientation.y = xform.getRotation().getY();
+   pMap.pose.orientation.z = xform.getRotation().getZ();
+   pMap.pose.orientation.w = xform.getRotation().getW();
+
+
    pose=pMap;
 
 }
@@ -119,16 +141,22 @@ bool HK_Robot_Base::AGotoPoseScheduleFromSendPosUntilArrive(geometry_msgs::PoseS
 {
     if(gotoPose_init_)  // should deliver only once
     {
-    //       ROS_INFO("a goto pose task");
+    ROS_INFO("a gxxxxxxxxxxxxxxxxxx %f, %f, %f",pos_.pose.position.x,pos_.pose.position.y,pos_.pose.position.z);
         gotoPose(pos_);
-        gotoPose(pos_);
+
+        ROS_INFO("a yyyyyyyyyyyyyyyyyyyy");
+
         gotoPose_init_=false;
     }
 
     if(arriveAtPose(pos_))
         return true;
     else
+    {
+    //   ROS_INFO("pub again task");
+     //      gotoPose(pos_);
         return false;
+    }
 }
 
 void HK_Robot_Base::InitATaskSchedule()
@@ -146,9 +174,9 @@ bool HK_Robot_Base::ATaskOfGotoPose(geometry_msgs::PoseStamped pos_)
     return AGotoPoseScheduleFromSendPosUntilArrive(pos_);
 }
 
-bool HK_Robot_Base::taskFlow(vector<geometry_msgs::PoseStamped> poses_)
+bool HK_Robot_Base::taskFlow(vector<geometry_msgs::PoseStamped>& poses_)
 {
-//    ROS_INFO("In task flow %d",poses_.size());
+   ROS_INFO("In task flow %d",poses_.size());
 
     if(!poses_.empty())
     {
@@ -162,7 +190,9 @@ bool HK_Robot_Base::taskFlow(vector<geometry_msgs::PoseStamped> poses_)
             ROS_INFO("The Position (%.2f, %.2f, %.2f) is arrived!", p.x,p.y,p.z);
             ROS_INFO("The Position (%.2f, %.2f, %.2f) is arrived!", p.x,p.y,p.z);
 
-           poses_.pop_back();
+            poses_.pop_back();
+            ROS_INFO("Poses left %d!", poses_.size());
+
             InitATaskSchedule();
        }
 

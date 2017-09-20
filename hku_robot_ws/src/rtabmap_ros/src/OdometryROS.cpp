@@ -172,6 +172,7 @@ void OdometryROS::onInit()
     }
 
 
+
 	//parameters
 	parameters_ = Parameters::getDefaultOdometryParameters(stereoParams_, visParams_, icpParams_);
 	if(!configPath.empty())
