@@ -1,0 +1,19 @@
+<launch>
+  <node
+    pkg="wiimote"
+    name="teleop_wiimote"
+    type="teleop_wiimote"
+  >
+  <remap
+    from="/cmd_vel"
+    to="/cmd_vel_mux/input/teleop"
+  />
+  </node>
+  <node
+    pkg="wiimote"
+    type="wiimote_node"
+    name="wiimote_controller"
+    output="screen"
+    required="true"
+  />
+</launch>
