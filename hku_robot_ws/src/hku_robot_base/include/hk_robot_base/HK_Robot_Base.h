@@ -31,7 +31,7 @@ public:
     void gotoPose(geometry_msgs::PoseStamped pose);
     void getPose(geometry_msgs::PoseStamped& pose);
     geometry_msgs::PoseStamped getPose();
-    bool arriveAtPose(geometry_msgs::PoseStamped pose, float tolerance =0.1, float r_tolerance=100);
+    bool arriveAtPose(geometry_msgs::PoseStamped pose, float tolerance =0.15, float r_tolerance=100);
     void setSpeed(Vector3f speed); //x,y,r
     void stop();
 
